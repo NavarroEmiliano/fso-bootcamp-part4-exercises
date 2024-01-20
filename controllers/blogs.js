@@ -1,12 +1,12 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 
-blogsRouter.get('/blogs', async (request, response) => {
+blogsRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({})
   response.json(blogs)
 })
 
-blogsRouter.post('/blogs', async (request, response) => {
+blogsRouter.post('/', async (request, response) => {
   const { title, url } = request.body
   if (!title || !url) {
     return response.status(400).json({ error: 'incomplete properties' })
@@ -17,12 +17,12 @@ blogsRouter.post('/blogs', async (request, response) => {
   response.status(201).json(savedBlog)
 })
 
-blogsRouter.delete('/blogs/:id', async (request, response) => {
+blogsRouter.delete('/:id', async (request, response) => {
   await Blog.findByIdAndDelete(request.params.id)
   response.status(204).end()
 })
 
-blogsRouter.put('/blogs/:id', async (request, response, next) => {
+blogsRouter.put('/:id', async (request, response, next) => {
   const body = request.body
 
   const blog = {
