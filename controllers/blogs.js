@@ -1,19 +1,31 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 blogsRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
   response.json(blogs)
 })
 
 blogsRouter.post('/', async (request, response) => {
-  const { title, url } = request.body
+  const { title, author, url, likes } = request.body
   if (!title || !url) {
     return response.status(400).json({ error: 'incomplete properties' })
   }
-  const blog = new Blog(request.body)
+  const allUsers = await User.find({})
+  const index = Math.floor(Math.random() * allUsers.length)
+  const userFound = allUsers[index]
+  const blog = new Blog({
+    title,
+    author,
+    url,
+    likes,
+    user: userFound._id
+  })
 
   const savedBlog = await blog.save()
+  userFound.blogs = userFound.blogs.concat(savedBlog._id)
+  await userFound.save()
   response.status(201).json(savedBlog)
 })
 
