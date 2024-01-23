@@ -40,8 +40,15 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
-  response.status(204).end()
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  const blogFound = await Blog.findById(request.params.id)
+  if (!blogFound) {
+    return response.status(404).json({ error: 'the blog does not exist' })
+  }
+  if (decodedToken.id.toString() === blogFound.user.toString()) {
+    await Blog.findByIdAndDelete(request.params.id)
+    response.status(204).end()
+  }
 })
 
 blogsRouter.put('/:id', async (request, response, next) => {
