@@ -15,7 +15,7 @@ blogsRouter.post('/', async (request, response) => {
     return response.status(401).json({ error: 'token missing or invalid' })
   }
 
-  if (!title || !url) {
+  if (!title || !url || !author) {
     return response.status(400).json({ error: 'incomplete properties' })
   }
 
