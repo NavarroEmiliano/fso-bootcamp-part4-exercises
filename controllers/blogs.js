@@ -55,17 +55,17 @@ blogsRouter.delete('/:id', async (request, response) => {
 
 blogsRouter.put('/:id', async (request, response, next) => {
   const body = request.body
-  const user = request.user
+  /*   const user = request.user */
 
   const blogFound = await Blog.findById(request.params.id)
   if (!blogFound) {
     return response.status(404).json({ error: 'the blog does not exist' })
   }
-  if (user.id !== blogFound.user.toString()) {
+  /*   if (user.id !== blogFound.user.toString()) {
     return response
       .status(401)
       .json({ error: 'this user cannot update this blog' })
-  }
+  } */
 
   const blog = {
     title: body.title,
@@ -80,6 +80,18 @@ blogsRouter.put('/:id', async (request, response, next) => {
   })
 
   response.json(updatedBlog)
+})
+
+blogsRouter.post('/:id/comments', async (request, response) => {
+  const { id } = request.params
+  const { comment } = request.body
+
+  const blog = await Blog.findById(id)
+
+  const updatedComments = blog.comments.concat(comment)
+  blog.comments = updatedComments
+  await blog.save()
+  response.status(201).json(blog)
 })
 
 module.exports = blogsRouter
